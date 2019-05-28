@@ -4,8 +4,8 @@ class TasksController < ApplicationController
   
   def index
     # @tasks = Task.where(user_id: current_user.id)
-    # @tasks = Task.where(user: current_user)
-    @tasks = current_user.tasks
+    @tasks = Task.where(user: current_user)
+    # @tasks = current_user.tasks
   end
 
   def show
