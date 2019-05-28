@@ -1,21 +1,29 @@
 class TasksController < ApplicationController
   before_action :set_task, only: [:show, :edit, :update, :destroy]
+  before_action :check_user, only: [:show, :edit, :update, :destroy]
   
   def index
-    @tasks = Task.all
+    # @tasks = Task.where(user_id: current_user.id)
+    # @tasks = Task.where(user: current_user)
+    @tasks = current_user.tasks
   end
 
   def show
-#    set_task
-#    @task = Task.find(params[:id])
+    # set_task
+    # @task = Task.find(params[:id])
   end
 
   def new
     @task = Task.new
+    @task.user_id = current_user.id
   end
 
   def create
     @task = Task.new(task_params)
+    @task.user_id = current_user.id
+    # @task.user = current_user
+
+    # @task = current_user.tasks.build(task_params)
 
     if @task.save
       flash[:success] = 'Task が正常に投稿されました'
@@ -56,11 +64,19 @@ class TasksController < ApplicationController
   private
   
   def set_task
-    @task = Task.find(params[:id])
+    @task = Task.find_by(id: params[:id])
+    redirect_to root_url unless @task
   end
 
   # Strong Parameter
   def task_params
     params.require(:task).permit(:content, :status)
+  end
+  
+  def check_user
+    # カリキュラムだと同じような実装がcorrect_userというメソッドでされている
+    if @task.user != current_user
+      redirect_to root_url
+    end
   end
 end
